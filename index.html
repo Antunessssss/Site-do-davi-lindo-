@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Artilheiros do Futebol Mundial</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pitch: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16'
+                        },
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04'
+                        },
+                        darkbg: '#0b0f17',
+                        cardbg: '#151c28'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f17;
+            color: #f3f4f6;
+        }
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.25);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.2);
+        }
+        .glass-card {
+            background: rgba(21, 28, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between custom-scrollbar selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 w-full glass-card border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <span class="font-display text-xl font-bold tracking-tight text-white block leading-none">
+                        Goleadores<span class="text-amber-400">World</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Temporada Atual • Estatísticas em Tempo Real</span>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+                <a href="#artilheiros" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-fire text-amber-400"></i> Top Geral</a>
+                <a href="#ligas" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-globe"></i> Por Liga</a>
+                <a href="#comparador" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-sliders"></i> Comparador</a>
+                <a href="#estatisticas" class="hover:text-emerald-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> Análises</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="openCompareModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-emerald-500/20">
+                    <i class="fa-solid fa-code-compare"></i>
+                    <span>Comparar xG</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="relative overflow-hidden py-10 sm:py-14 bg-gradient-to-b from-slate-900 via-slate-950 to-darkbg">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-64 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-crown text-xs"></i> Chuteira de Ouro Global
+                </div>
+                <h1 class="font-display text-3xl sm:text-5xl font-black text-white tracking-tight mb-4">
+                    Os Reis dos Gols das <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-300">Maiores Ligas do Mundo</span>
+                </h1>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+                    Acompanhe o ranking atualizado dos maiores goleadores da Europa, América do Sul, Arábia Saudita e EUA. Compare gols, assistências, eficiência por minuto e gols esperados (xG).
+                </p>
+            </div>
+
+            <!-- Global Stats Highlights Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+                <div class="glass-card rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden group hover:border-amber-500/40 transition-all">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Líder Global</div>
+                    <div class="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-amber-400 transition-colors" id="topLeaderName">Erling Haaland</div>
+                    <div class="text-amber-400 font-extrabold text-2xl sm:text-3xl mt-1" id="topLeaderGoals">28 Gols</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Manchester City • Premier League</div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden group hover:border-emerald-500/40 transition-all">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Melhor Média (G/90')</div>
+                    <div class="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors" id="topRatioName">Viktor Gyökeres</div>
+                    <div class="text-emerald-400 font-extrabold text-2xl sm:text-3xl mt-1" id="topRatioVal">1.22</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Sporting CP • Liga Portugal</div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden group hover:border-blue-500/40 transition-all">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Líder em Participações</div>
+                    <div class="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-blue-400 transition-colors" id="topAssistsName">Mohamed Salah</div>
+                    <div class="text-blue-400 font-extrabold text-2xl sm:text-3xl mt-1" id="topAssistsVal">35 G+A</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Liverpool • Premier League</div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden group hover:border-purple-500/40 transition-all">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Destaque Sul-Americano</div>
+                    <div class="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-purple-400 transition-colors" id="topSaName">Pedro</div>
+                    <div class="text-purple-400 font-extrabold text-2xl sm:text-3xl mt-1" id="topSaGoals">19 Gols</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Flamengo • Brasileirão</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-12">
+
+        <!-- Controls: Search & League Filter Tabs -->
+        <section id="artilheiros" class="space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-ranking-star text-amber-400"></i>
+                        Classificação Geral dos Artilheiros
+                    </h2>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-1">Filtre por campeonato ou busque pelo nome do seu craque favorito.</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full lg:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="renderTable()" placeholder="Buscar jogador ou clube..." 
+                           class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+                </div>
+            </div>
+
+            <!-- League Categories Filter -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                <button onclick="setLeagueFilter('all')" class="filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-emerald-500 text-slate-950 shadow-md">
+                    <i class="fa-solid fa-globe mr-1.5"></i> Todas as Ligas
+                </button>
+                <button onclick="setLeagueFilter('Premier League')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇬🇧 Premier League
+                </button>
+                <button onclick="setLeagueFilter('La Liga')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇪🇸 La Liga
+                </button>
+                <button onclick="setLeagueFilter('Serie A')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇮🇹 Serie A
+                </button>
+                <button onclick="setLeagueFilter('Bundesliga')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇩🇪 Bundesliga
+                </button>
+                <button onclick="setLeagueFilter('Ligue 1')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇫🇷 Ligue 1
+                </button>
+                <button onclick="setLeagueFilter('Brasileirão')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇧🇷 Brasileirão
+                </button>
+                <button onclick="setLeagueFilter('Saudi Pro League')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇸🇦 Saudi League
+                </button>
+                <button onclick="setLeagueFilter('MLS')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇺🇸 MLS
+                </button>
+                <button onclick="setLeagueFilter('Liga Portugal')" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800">
+                    🇵🇹 Liga Portugal
+                </button>
+            </div>
+
+            <!-- Top 3 Podium Spotlight Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2" id="podiumCards">
+                <!-- Dynamically rendered top 3 cards -->
+            </div>
+
+            <!-- Interactive Goalscorer Table -->
+            <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 shadow-xl">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900/90 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-800">
+                                <th class="py-4 px-4 text-center w-12">#</th>
+                                <th class="py-4 px-4">Jogador</th>
+                                <th class="py-4 px-4">Clube & Liga</th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-white" onclick="changeSort('jogos')">
+                                    Jogos <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-amber-400" onclick="changeSort('gols')">
+                                    Gols <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-blue-400" onclick="changeSort('assistencias')">
+                                    Assists <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-emerald-400" onclick="changeSort('penaltis')">
+                                    Pênaltis <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-teal-400" onclick="changeSort('xg')">
+                                    xG <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-center cursor-pointer hover:text-purple-400" onclick="changeSort('media')">
+                                    Gols/90' <i class="fa-solid fa-sort text-[10px] ml-1"></i>
+                                </th>
+                                <th class="py-4 px-4 text-right pr-6">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-800/60 text-sm">
+                            <!-- Dynamically populated rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- League Summaries Grid Section -->
+        <section id="ligas" class="space-y-6 pt-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-earth-americas text-emerald-400"></i>
+                    Líderes de Artilharia por Campeonato
+                </h2>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1">Resumo do artilheiro nº 1 em cada uma das ligas monitoradas.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="leagueSummariesGrid">
+                <!-- Dynamically populated league cards -->
+            </div>
+        </section>
+
+        <!-- Analytics & Goal Distribution Section -->
+        <section id="estatisticas" class="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
+            <!-- Goals Breakdown Chart -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-pie-chart text-emerald-400"></i> Tipos de Gols do Top 5
+                        </h3>
+                        <p class="text-xs text-slate-400">Distribuição: Pé direito, Pé esquerdo e Cabeça</p>
+                    </div>
+                </div>
+                <div class="h-64 relative flex items-center justify-center">
+                    <canvas id="goalTypeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- League Averages Comparison Chart -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-column text-amber-400"></i> Média de Gols do Artilheiro por Liga
+                        </h3>
+                        <p class="text-xs text-slate-400">Total de gols do líder de cada competição</p>
+                    </div>
+                </div>
+                <div class="h-64 relative flex items-center justify-center">
+                    <canvas id="leagueAvgChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Player Detail Modal -->
+    <div id="playerModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-card rounded-3xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar p-6 sm:p-8 relative shadow-2xl animate-fade-in">
+            <button onclick="closePlayerModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div id="modalContent">
+                <!-- Dynamically filled profile data -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Tool Drawer / Modal -->
+    <div id="compareModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-card rounded-3xl border border-slate-700 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar p-6 sm:p-8 relative shadow-2xl">
+            <button onclick="closeCompareModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-8">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-950/50 px-3 py-1 rounded-full border border-emerald-800/50">Módulo de Comparação</span>
+                <h3 class="font-display text-2xl sm:text-3xl font-black text-white mt-2">Duplo Confronto de Atacantes</h3>
+                <p class="text-slate-400 text-xs sm:text-sm">Selecione dois jogadores para comparar métricas essenciais lado a lado.</p>
+            </div>
+
+            <!-- Selectors -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase">Atacante 1</label>
+                    <select id="p1Select" onchange="renderComparison()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-emerald-500 focus:outline-none">
+                        <!-- Filled JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase">Atacante 2</label>
+                    <select id="p2Select" onchange="renderComparison()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-amber-500 focus:outline-none">
+                        <!-- Filled JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Comparison Metric Bars -->
+            <div id="compareContainer" class="space-y-6">
+                <!-- Dynamically filled -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 mt-16 py-8 text-slate-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-futbol text-emerald-500"></i>
+                <span class="font-bold text-slate-300">GoleadoresWorld</span>
+                <span>— Estatísticas e artilharia do futebol mundial.</span>
+            </div>
+            <div class="text-center sm:text-right">
+                <span>Dados atualizados regularmente para a temporada 2025/2026.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Data Store: Top scorers around the world
+        const playersData = [
+            {
+                id: 'haaland',
+                name: 'Erling Haaland',
+                club: 'Manchester City',
+                league: 'Premier League',
+                flag: '🇬🇧',
+                nationality: 'Noruega',
+                avatar: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=300&q=80',
+                jogos: 26,
+                gols: 28,
+                assistencias: 5,
+                penaltis: 6,
+                xg: 26.4,
+                minutos: 2280,
+                peDireito: 5,
+                peEsquerdo: 19,
+                cabeca: 4,
+                chutesNoGolPct: 64,
+                chutesPorJogo: 4.2
+            },
+            {
+                id: 'gyokeres',
+                name: 'Viktor Gyökeres',
+                club: 'Sporting CP',
+                league: 'Liga Portugal',
+                flag: '🇵🇹',
+                nationality: 'Suécia',
+                avatar: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&q=80',
+                jogos: 24,
+                gols: 27,
+                assistencias: 8,
+                penaltis: 7,
+                xg: 23.8,
+                minutos: 2110,
+                peDireito: 21,
+                peEsquerdo: 4,
+                cabeca: 2,
+                chutesNoGolPct: 58,
+                chutesPorJogo: 4.5
+            },
+            {
+                id: 'kane',
+                name: 'Harry Kane',
+                club: 'Bayern München',
+                league: 'Bundesliga',
+                flag: '🇩🇪',
+                nationality: 'Inglaterra',
+                avatar: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=300&q=80',
+                jogos: 25,
+                gols: 25,
+                assistencias: 9,
+                penaltis: 5,
+                xg: 22.1,
+                minutos: 2190,
+                peDireito: 16,
+                peEsquerdo: 6,
+                cabeca: 3,
+                chutesNoGolPct: 61,
+                chutesPorJogo: 3.8
+            },
+            {
+                id: 'mbappe',
+                name: 'Kylian Mbappé',
+                club: 'Real Madrid',
+                league: 'La Liga',
+                flag: '🇪🇸',
+                nationality: 'França',
+                avatar: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=300&q=80',
+                jogos: 26,
+                gols: 23,
+                assistencias: 6,
+                penaltis: 4,
+                xg: 21.5,
+                minutos: 2250,
+                peDireito: 19,
+                peEsquerdo: 3,
+                cabeca: 1,
+                chutesNoGolPct: 59,
+                chutesPorJogo: 4.8
+            },
+            {
+                id: 'salah',
+                name: 'Mohamed Salah',
+                club: 'Liverpool',
+                league: 'Premier League',
+                flag: '🇬🇧',
+                nationality: 'Egito',
+                avatar: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=300&q=80',
+                jogos: 27,
+                gols: 22,
+                assistencias: 13,
+                penaltis: 5,
+                xg: 20.2,
+                minutos: 2340,
+                peDireito: 2,
+                peEsquerdo: 20,
+                cabeca: 0,
+                chutesNoGolPct: 56,
+                chutesPorJogo: 3.6
+            },
+            {
+                id: 'lewandowski',
+                name: 'Robert Lewandowski',
+                club: 'FC Barcelona',
+                league: 'La Liga',
+                flag: '🇪🇸',
+                nationality: 'Polônia',
+                avatar: 'https://images.unsplash.com/photo-1560272564-669be084619b?auto=format&fit=crop&w=300&q=80',
+                jogos: 25,
+                gols: 21,
+                assistencias: 4,
+                penaltis: 3,
+                xg: 19.8,
+                minutos: 2080,
+                peDireito: 14,
+                peEsquerdo: 4,
+                cabeca: 3,
+                chutesNoGolPct: 57,
+                chutesPorJogo: 3.9
+            },
+            {
+                id: 'retegui',
+                name: 'Mateo Retegui',
+                club: 'Atalanta',
+                league: 'Serie A',
+                flag: '🇮🇹',
+                nationality: 'Itália',
+                avatar: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=300&q=80',
+                jogos: 24,
+                gols: 20,
+                assistencias: 3,
+                penaltis: 3,
+                xg: 17.5,
+                minutos: 1950,
+                peDireito: 13,
+                peEsquerdo: 3,
+                cabeca: 4,
+                chutesNoGolPct: 53,
+                chutesPorJogo: 3.5
+            },
+            {
+                id: 'marmoush',
+                name: 'Omar Marmoush',
+                club: 'Eintracht Frankfurt',
+                league: 'Bundesliga',
+                flag: '🇩🇪',
+                nationality: 'Egito',
+                avatar: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=300&q=80',
+                jogos: 22,
+                gols: 19,
+                assistencias: 10,
+                penaltis: 2,
+                xg: 16.2,
+                minutos: 1890,
+                peDireito: 16,
+                peEsquerdo: 2,
+                cabeca: 1,
+                chutesNoGolPct: 54,
+                chutesPorJogo: 3.7
+            },
+            {
+                id: 'ronaldo',
+                name: 'Cristiano Ronaldo',
+                club: 'Al-Nassr',
+                league: 'Saudi Pro League',
+                flag: '🇸🇦',
+                nationality: 'Portugal',
+                avatar: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=300&q=80',
+                jogos: 23,
+                gols: 21,
+                assistencias: 4,
+                penaltis: 7,
+                xg: 19.1,
+                minutos: 2050,
+                peDireito: 14,
+                peEsquerdo: 4,
+                cabeca: 3,
+                chutesNoGolPct: 58,
+                chutesPorJogo: 4.6
+            },
+            {
+                id: 'pedro',
+                name: 'Pedro',
+                club: 'Flamengo',
+                league: 'Brasileirão',
+                flag: '🇧🇷',
+                nationality: 'Brasil',
+                avatar: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=300&q=80',
+                jogos: 28,
+                gols: 19,
+                assistencias: 5,
+                penaltis: 4,
+                xg: 17.8,
+                minutos: 2320,
+                peDireito: 12,
+                peEsquerdo: 3,
+                cabeca: 4,
+                chutesNoGolPct: 52,
+                chutesPorJogo: 3.1
+            },
+            {
+                id: 'barcola',
+                name: 'Bradley Barcola',
+                club: 'Paris Saint-Germain',
+                league: 'Ligue 1',
+                flag: '🇫🇷',
+                nationality: 'França',
+                avatar: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=300&q=80',
+                jogos: 23,
+                gols: 15,
+                assistencias: 7,
+                penaltis: 1,
+                xg: 12.9,
+                minutos: 1810,
+                peDireito: 13,
+                peEsquerdo: 2,
+                cabeca: 0,
+                chutesNoGolPct: 50,
+                chutesPorJogo: 2.9
+            },
+            {
+                id: 'messi',
+                name: 'Lionel Messi',
+                club: 'Inter Miami',
+                league: 'MLS',
+                flag: '🇺🇸',
+                nationality: 'Argentina',
+                avatar: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=300&q=80',
+                jogos: 20,
+                gols: 20,
+                assistencias: 11,
+                penaltis: 2,
+                xg: 16.5,
+                minutos: 1750,
+                peDireito: 2,
+                peEsquerdo: 18,
+                cabeca: 0,
+                chutesNoGolPct: 62,
+                chutesPorJogo: 4.1
+            },
+            {
+                id: 'yuri',
+                name: 'Yuri Alberto',
+                club: 'Corinthians',
+                league: 'Brasileirão',
+                flag: '🇧🇷',
+                nationality: 'Brasil',
+                avatar: 'https://images.unsplash.com/photo-1560272564-669be084619b?auto=format&fit=crop&w=300&q=80',
+                jogos: 29,
+                gols: 16,
+                assistencias: 4,
+                penaltis: 2,
+                xg: 15.1,
+                minutos: 2410,
+                peDireito: 11,
+                peEsquerdo: 3,
+                cabeca: 2,
+                chutesNoGolPct: 48,
+                chutesPorJogo: 3.3
+            },
+            {
+                id: 'mitrovic',
+                name: 'Aleksandar Mitrović',
+                club: 'Al-Hilal',
+                league: 'Saudi Pro League',
+                flag: '🇸🇦',
+                nationality: 'Sérvia',
+                avatar: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=300&q=80',
+                jogos: 22,
+                gols: 18,
+                assistencias: 3,
+                penaltis: 5,
+                xg: 16.9,
+                minutos: 1920,
+                peDireito: 10,
+                peEsquerdo: 2,
+                cabeca: 6,
+                chutesNoGolPct: 55,
+                chutesPorJogo: 3.6
+            }
+        ];
+
+        // Global State
+        let currentLeagueFilter = 'all';
+        let currentSort = { field: 'gols', direction: 'desc' };
+        let goalChartInstance = null;
+        let leagueChartInstance = null;
+
+        // Calculate helper properties
+        function processData() {
+            return playersData.map(p => {
+                const ratio = (p.gols / (p.minutos / 90)).toFixed(2);
+                return {
+                    ...p,
+                    goalsPer90: parseFloat(ratio),
+                    totalContrib: p.gols + p.assistencias
+                };
+            });
+        }
+
+        // Initialize Application
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPodium();
+            renderTable();
+            renderLeagueSummaries();
+            initCharts();
+            populateCompareDropdowns();
+        });
+
+        // Set League Filter
+        function setLeagueFilter(league) {
+            currentLeagueFilter = league;
+            
+            // UI Button state updates
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(league) || (league === 'all' && btn.textContent.includes('Todas'))) {
+                    btn.className = 'filter-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-emerald-500 text-slate-950 shadow-md';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800';
+                }
+            });
+
+            renderTable();
+        }
+
+        // Change Sort Field
+        function changeSort(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'desc' ? 'asc' : 'desc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'desc';
+            }
+            renderTable();
+        }
+
+        // Filter and Sort Data
+        function getFilteredData() {
+            let processed = processData();
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (currentLeagueFilter !== 'all') {
+                processed = processed.filter(p => p.league === currentLeagueFilter);
+            }
+
+            if (searchVal) {
+                processed = processed.filter(p => 
+                    p.name.toLowerCase().includes(searchVal) || 
+                    p.club.toLowerCase().includes(searchVal) ||
+                    p.nationality.toLowerCase().includes(searchVal)
+                );
+            }
+
+            // Sorting logic
+            processed.sort((a, b) => {
+                let valA = a[currentSort.field];
+                let valB = b[currentSort.field];
+
+                if (currentSort.field === 'media') {
+                    valA = a.goalsPer90;
+                    valB = b.goalsPer90;
+                }
+
+                if (currentSort.direction === 'desc') {
+                    return valB - valA;
+                } else {
+                    return valA - valB;
+                }
+            });
+
+            return processed;
+        }
+
+        // Render Top 3 Spotlight Podium
+        function renderPodium() {
+            const sorted = processData().sort((a, b) => b.gols - a.gols).slice(0, 3);
+            const container = document.getElementById('podiumCards');
+
+            const order = [1, 0, 2]; // Show 2nd, 1st, 3rd visually for podium effect
+            const ranks = ['1º Lugar • Chuteira de Ouro', '2º Lugar', '3º Lugar'];
+            const badgeColors = ['bg-amber-400 text-slate-950', 'bg-slate-300 text-slate-950', 'bg-amber-700 text-white'];
+            const cardBorders = ['border-amber-500/50 glow-gold', 'border-slate-700', 'border-amber-800/40'];
+
+            container.innerHTML = order.map(idx => {
+                const p = sorted[idx];
+                const isGold = idx === 0;
+
+                return `
+                    <div class="glass-card rounded-3xl p-6 border ${cardBorders[idx]} relative flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300">
+                        <div class="absolute -top-3 left-6 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${badgeColors[idx]} shadow-lg">
+                            ${ranks[idx]}
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mt-2 mb-4">
+                                <span class="text-xs font-semibold text-slate-400">${p.flag} ${p.league}</span>
+                                <span class="text-xs font-bold text-slate-500">${p.jogos} Jogos</span>
+                            </div>
+
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-800 border-2 ${isGold ? 'border-amber-400' : 'border-slate-700'} flex-shrink-0">
+                                    <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/1e293b/ffffff?text=${p.name.charAt(0)}'">
+                                </div>
+                                <div>
+                                    <h3 class="font-display text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">${p.name}</h3>
+                                    <p class="text-xs text-slate-400">${p.club}</p>
+                                    <div class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 bg-slate-900 px-2 py-0.5 rounded-md mt-1 border border-slate-800">
+                                        <span>Nacionalidade:</span>
+                                        <span class="font-semibold text-white">${p.nationality}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-medium">Gols Marcados</span>
+                                <span class="font-display text-3xl font-black ${isGold ? 'text-amber-400' : 'text-emerald-400'}">${p.gols}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-medium">Média por 90'</span>
+                                <span class="font-display text-xl font-extrabold text-white">${p.goalsPer90}</span>
+                            </div>
+                            <button onclick="openPlayerModal('${p.id}')" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 flex items-center justify-center transition-all">
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Main Goalscorer Table
+        function renderTable() {
+            const data = getFilteredData();
+            const tbody = document.getElementById('tableBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="py-12 text-center text-slate-500">
+                            <i class="fa-solid fa-futbol text-3xl mb-2 block text-slate-600"></i>
+                            Nenhum jogador encontrado com os filtros selecionados.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map((p, index) => {
+                const rank = index + 1;
+                let rankBadge = `<span class="text-slate-400 font-bold">${rank}</span>`;
+                if (rank === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center mx-auto shadow-md">1</span>`;
+                if (rank === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-slate-300 text-slate-950 font-black text-xs flex items-center justify-center mx-auto">2</span>`;
+                if (rank === 3) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center mx-auto">3</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-800/40 transition-colors group">
+                        <td class="py-3.5 px-4 text-center font-medium">${rankBadge}</td>
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-slate-800 overflow-hidden border border-slate-700 flex-shrink-0">
+                                    <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/50x50/1e293b/ffffff?text=${p.name.charAt(0)}'">
+                                </div>
+                                <div>
+                                    <button onclick="openPlayerModal('${p.id}')" class="font-semibold text-white group-hover:text-emerald-400 transition-colors text-left block">
+                                        ${p.name}
+                                    </button>
+                                    <span class="text-[11px] text-slate-400">${p.nationality}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="text-slate-200 font-medium">${p.club}</div>
+                            <div class="text-[11px] text-slate-400">${p.flag} ${p.league}</div>
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-300">${p.jogos}</td>
+                        <td class="py-3.5 px-4 text-center font-extrabold text-amber-400 text-base">${p.gols}</td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-blue-400">${p.assistencias}</td>
+                        <td class="py-3.5 px-4 text-center text-slate-300">${p.penaltis}</td>
+                        <td class="py-3.5 px-4 text-center font-mono text-xs text-teal-300">${p.xg}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-purple-400">${p.goalsPer90}</td>
+                        <td class="py-3.5 px-4 text-right pr-6">
+                            <button onclick="openPlayerModal('${p.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-slate-300 text-xs font-semibold transition-all">
+                                Detalhes
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render League Summaries Cards
+        function renderLeagueSummaries() {
+            const grid = document.getElementById('leagueSummariesGrid');
+            const processed = processData();
+
+            const leagues = [
+                { name: 'Premier League', flag: '🇬🇧', region: 'Inglaterra' },
+                { name: 'La Liga', flag: '🇪🇸', region: 'Espanha' },
+                { name: 'Bundesliga', flag: '🇩🇪', region: 'Alemanha' },
+                { name: 'Serie A', flag: '🇮🇹', region: 'Itália' },
+                { name: 'Ligue 1', flag: '🇫🇷', region: 'França' },
+                { name: 'Brasileirão', flag: '🇧🇷', region: 'Brasil' },
+                { name: 'Liga Portugal', flag: '🇵🇹', region: 'Portugal' },
+                { name: 'Saudi Pro League', flag: '🇸🇦', region: 'Arábia Saudita' },
+                { name: 'MLS', flag: '🇺🇸', region: 'Estados Unidos' }
+            ];
+
+            grid.innerHTML = leagues.map(lg => {
+                const topScorer = processed
+                    .filter(p => p.league === lg.name)
+                    .sort((a, b) => b.gols - a.gols)[0];
+
+                if (!topScorer) return '';
+
+                return `
+                    <div class="glass-card rounded-2xl p-5 border border-slate-800 relative group hover:border-emerald-500/40 transition-all">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">${lg.flag}</span>
+                                <span class="font-display font-bold text-white text-base">${lg.name}</span>
+                            </div>
+                            <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/40">Líder</span>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-slate-800 overflow-hidden border border-slate-700 flex-shrink-0">
+                                <img src="${topScorer.avatar}" alt="${topScorer.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/80x80/1e293b/ffffff?text=${topScorer.name.charAt(0)}'">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-white text-base truncate group-hover:text-emerald-400 transition-colors">${topScorer.name}</h4>
+                                <p class="text-xs text-slate-400 truncate">${topScorer.club}</p>
+                                <div class="mt-2 flex items-center justify-between text-xs">
+                                    <span class="text-amber-400 font-extrabold text-lg">${topScorer.gols} <span class="text-xs font-normal text-slate-400">gols</span></span>
+                                    <span class="text-slate-400">${topScorer.assistencias} assist.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize Chart.js Data Visualizations
+        function initCharts() {
+            const top5 = processData().sort((a, b) => b.gols - a.gols).slice(0, 5);
+
+            // Goal Types Chart
+            const ctx1 = document.getElementById('goalTypeChart').getContext('2d');
+            goalChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: top5.map(p => p.name.split(' ').pop()),
+                    datasets: [
+                        {
+                            label: 'Pé Direito',
+                            data: top5.map(p => p.peDireito),
+                            backgroundColor: '#3b82f6'
+                        },
+                        {
+                            label: 'Pé Esquerdo',
+                            data: top5.map(p => p.peEsquerdo),
+                            backgroundColor: '#22c55e'
+                        },
+                        {
+                            label: 'Cabeça',
+                            data: top5.map(p => p.cabeca),
+                            backgroundColor: '#eab308'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af', font: { family: 'Inter', size: 11 } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+
+            // League Top Scorers Comparison Chart
+            const leagues = ['Premier League', 'Liga Portugal', 'Bundesliga', 'La Liga', 'Serie A', 'Brasileirão', 'Saudi Pro League', 'MLS'];
+            const leagueGols = leagues.map(lg => {
+                const top = processData().filter(p => p.league === lg).sort((a, b) => b.gols - a.gols)[0];
+                return top ? top.gols : 0;
+            });
+
+            const ctx2 = document.getElementById('leagueAvgChart').getContext('2d');
+            leagueChartInstance = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['PL', 'Liga Portugal', 'Bundesliga', 'La Liga', 'Serie A', 'Brasileirão', 'Saudi', 'MLS'],
+                    datasets: [{
+                        label: 'Gols do Artilheiro',
+                        data: leagueGols,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#facc15',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+        }
+
+        // Player Profile Modal Functionality
+        function openPlayerModal(playerId) {
+            const player = processData().find(p => p.id === playerId);
+            if (!player) return;
+
+            const modal = document.getElementById('playerModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div class="flex items-start gap-5 border-b border-slate-800 pb-6 mb-6">
+                    <div class="w-20 h-20 rounded-2xl bg-slate-800 overflow-hidden border-2 border-emerald-500 shadow-lg flex-shrink-0">
+                        <img src="${player.avatar}" alt="${player.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100x100/1e293b/ffffff?text=${player.name.charAt(0)}'">
+                    </div>
+                    <div>
+                        <div class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 mb-1">
+                            ${player.flag} ${player.league}
+                        </div>
+                        <h2 class="font-display text-2xl sm:text-3xl font-black text-white">${player.name}</h2>
+                        <p class="text-sm text-slate-400">${player.club} • ${player.nationality}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Gols</span>
+                        <div class="font-display text-2xl font-black text-amber-400">${player.gols}</div>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Assistências</span>
+                        <div class="font-display text-2xl font-black text-blue-400">${player.assistencias}</div>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Média G/90'</span>
+                        <div class="font-display text-2xl font-black text-emerald-400">${player.goalsPer90}</div>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">xG Esperado</span>
+                        <div class="font-display text-2xl font-black text-teal-300">${player.xg}</div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="font-display font-bold text-white text-sm uppercase tracking-wider">Detalhamento dos Gols</h4>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>Pé Direito (${player.peDireito})</span>
+                                <span>${Math.round((player.peDireito / player.gols) * 100)}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: ${(player.peDireito / player.gols) * 100}%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>Pé Esquerdo (${player.peEsquerdo})</span>
+                                <span>${Math.round((player.peEsquerdo / player.gols) * 100)}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: ${(player.peEsquerdo / player.gols) * 100}%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>Cabeça (${player.cabeca})</span>
+                                <span>${Math.round((player.cabeca / player.gols) * 100)}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-amber-500 rounded-full" style="width: ${(player.cabeca / player.gols) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs">
+                        <div class="flex justify-between py-1 border-b border-slate-800/50">
+                            <span class="text-slate-400">Pênaltis convertidos</span>
+                            <span class="font-bold text-white">${player.penaltis}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-800/50">
+                            <span class="text-slate-400">Chutes por Jogo</span>
+                            <span class="font-bold text-white">${player.chutesPorJogo}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-800/50">
+                            <span class="text-slate-400">Precisão nos Chutes</span>
+                            <span class="font-bold text-emerald-400">${player.chutesNoGolPct}%</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-800/50">
+                            <span class="text-slate-400">Minutos em campo</span>
+                            <span class="font-bold text-white">${player.minutos}'</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closePlayerModal() {
+            const modal = document.getElementById('playerModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Comparison Tool Functions
+        function openCompareModal() {
+            const modal = document.getElementById('compareModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderComparison();
+        }
+
+        function closeCompareModal() {
+            const modal = document.getElementById('compareModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function populateCompareDropdowns() {
+            const p1 = document.getElementById('p1Select');
+            const p2 = document.getElementById('p2Select');
+            const data = processData();
+
+            const optionsHTML = data.map(p => `<option value="${p.id}">${p.name} (${p.club})</option>`).join('');
+            p1.innerHTML = optionsHTML;
+            p2.innerHTML = optionsHTML;
+
+            // Default selection
+            p1.value = 'haaland';
+            p2.value = 'gyokeres';
+        }
+
+        function renderComparison() {
+            const id1 = document.getElementById('p1Select').value;
+            const id2 = document.getElementById('p2Select').value;
+
+            const p1 = processData().find(p => p.id === id1);
+            const p2 = processData().find(p => p.id === id2);
+
+            if (!p1 || !p2) return;
+
+            const container = document.getElementById('compareContainer');
+
+            const metrics = [
+                { label: 'Gols Marcados', v1: p1.gols, v2: p2.gols, max: 35 },
+                { label: 'Assistências', v1: p1.assistencias, v2: p2.assistencias, max: 15 },
+                { label: 'Média Gols/90m', v1: p1.goalsPer90, v2: p2.goalsPer90, max: 1.5 },
+                { label: 'Gols Esperados (xG)', v1: p1.xg, v2: p2.xg, max: 30 },
+                { label: 'Precisão de Chutes %', v1: p1.chutesNoGolPct, v2: p2.chutesNoGolPct, max: 100 },
+                { label: 'Pênaltis Convertidos', v1: p1.penaltis, v2: p2.penaltis, max: 10 }
+            ];
+
+            container.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-800 text-center">
+                    <div>
+                        <span class="text-xs text-slate-400 block">${p1.club}</span>
+                        <h4 class="font-display font-extrabold text-lg text-emerald-400">${p1.name}</h4>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">${p2.club}</span>
+                        <h4 class="font-display font-extrabold text-lg text-amber-400">${p2.name}</h4>
+                    </div>
+                </div>
+
+                ${metrics.map(m => {
+                    const pct1 = Math.min(100, (m.v1 / m.max) * 100);
+                    const pct2 = Math.min(100, (m.v2 / m.max) * 100);
+                    const is1Higher = m.v1 > m.v2;
+                    const is2Higher = m.v2 > m.v1;
+
+                    return `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold ${is1Higher ? 'text-emerald-400' : 'text-slate-300'}">${m.v1}</span>
+                                <span class="text-slate-400 font-semibold uppercase tracking-wider text-[11px]">${m.label}</span>
+                                <span class="font-bold ${is2Higher ? 'text-amber-400' : 'text-slate-300'}">${m.v2}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 h-3 bg-slate-900 rounded-full overflow-hidden p-0.5">
+                                <div class="flex justify-end h-full">
+                                    <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${pct1}%"></div>
+                                </div>
+                                <div class="flex justify-start h-full">
+                                    <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: ${pct2}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+    </script>
+</body>
+</html>
